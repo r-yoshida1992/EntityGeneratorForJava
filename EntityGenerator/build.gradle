@@ -1,0 +1,19 @@
+plugins {
+	id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '16'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'mysql:mysql-connector-java:8.0.20'
+}
+
+test {
+	useJUnitPlatform()
+}
