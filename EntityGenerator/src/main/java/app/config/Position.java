@@ -6,6 +6,6 @@ package app.config;
 public class Position {
     public static final int LEFT = 100;
     public static final int TOP = 100;
-    public static final int WIDTH = 450;
-    public static final int HEIGHT = 120;
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 900;
 }

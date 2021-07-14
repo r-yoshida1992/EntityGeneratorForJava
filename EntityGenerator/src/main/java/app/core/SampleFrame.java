@@ -1,10 +1,10 @@
 package app.core;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,12 +14,12 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import app.config.Position;
 import app.connector.DataBaseConnector;
-import app.enums.ColumnType;
-import app.utils.StringUtil;
 
 public class SampleFrame extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -39,6 +39,8 @@ public class SampleFrame extends JFrame {
         // textFieldの配置
         JPanel contentPane = new JPanel();
         JPanel addPanel = new JPanel();
+        contentPane.setBackground(Color.DARK_GRAY);
+        addPanel.setBackground(Color.DARK_GRAY);
 
         // プルダウンの設定
         Set<String> tableNames = new HashSet<>();
@@ -49,44 +51,21 @@ public class SampleFrame extends JFrame {
         JComboBox<String> comboBox = new JComboBox<>();
         tableNames.forEach(comboBox::addItem);
 
+        JTextArea textArea = new JTextArea(50, 60);
+        textArea.setForeground(Color.WHITE);
+        textArea.setBackground(Color.DARK_GRAY);
+        JScrollPane scrollpane = new JScrollPane(textArea);
         JButton addButton = new JButton("Generate");
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    ResultSet rs = DataBaseConnector.executeSql(
-                            "select * from " + comboBox.getItemAt(comboBox.getSelectedIndex()) + " limit 1");
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    // 出力処理
-                    String header = new StringBuilder().append("import javax.persistence.Column;\n")
-                            .append("import javax.persistence.Entity;\n")
-                            .append("import javax.persistence.GeneratedValue;\n")
-                            .append("import javax.persistence.GenerationType;\n")
-                            .append("import javax.persistence.Id;\n").append("import javax.persistence.Table;\n")
-                            .append("\n").append("import lombok.Data;\n").append("import lombok.EqualsAndHashCode;\n")
-                            .append("/**\n").append(" * ").append(rsmd.getTableName(1)).append(" entity.\n")
-                            .append(" */\n").append("@Data\n").append("@Entity\n").append("@Table(name = \"")
-                            .append(rsmd.getTableName(1)).append("\")\n")
-                            .append("@EqualsAndHashCode(callSuper = false)\n").append("public class ")
-                            .append(StringUtil.snakeToCamel(rsmd.getTableName(1), false)).append("{\n").append("\n")
-                            .toString();
-                    System.out.print(header);
-                    rsmd.getColumnCount();
-                    for (int i = 0; i < rsmd.getColumnCount(); i++) {
-                        // カラム名の出力
-                        System.out.println("    @Column(name = \"" + rsmd.getColumnName(i + 1) + "\")");
-                        System.out.println(
-                                "    private " + ColumnType.valueOf(rsmd.getColumnTypeName(i + 1)).getObjectType() + " "
-                                        + StringUtil.snakeToCamel(rsmd.getColumnName(i + 1), true) + ";");
-                    }
-                    String footer = new StringBuilder().append("\n").append("}\n").toString();
-                    System.out.print(footer);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                // エンティティクラス定義の生成
+                textArea.setText(
+                        new EntityGenerateProcessor().generateEntity(comboBox.getItemAt(comboBox.getSelectedIndex())));
             }
         });
         addPanel.add(comboBox);
         addPanel.add(addButton);
+        addPanel.add(scrollpane);
 
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
