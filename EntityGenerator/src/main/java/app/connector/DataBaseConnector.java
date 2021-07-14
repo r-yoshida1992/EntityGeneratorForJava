@@ -6,25 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import app.config.Config;
+
 public class DataBaseConnector {
-    final static String url = "jdbc:mysql://localhost/test";
-    final static String user = "test";
-    final static String password = "test";
-
-    public static void connect(String sql) {
-        try {
-            ResultSet rs = executeSql("show tables");
-            while (rs.next()) {
-                System.out.println(rs.getString(1));
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    static Config conf = Config.getInstance();
 
     public static ResultSet executeSql(String sql) throws SQLException {
-        Connection con = DriverManager.getConnection(url, user, password);
+        Connection con = DriverManager.getConnection(conf.getUrl(), conf.getUser(), conf.getPassword());
         PreparedStatement pstmt = con.prepareStatement(sql);
         return pstmt.executeQuery();
     }

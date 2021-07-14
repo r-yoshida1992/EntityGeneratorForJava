@@ -17,7 +17,7 @@ public class StringUtil {
         }
         String[] splitWord = snake.split("_");
         StringBuilder camel = new StringBuilder();
-        // 連結用のfunction
+        // 文字列連結用のfunction
         BiFunction<String, String, String> concatFunction = (a, b) -> {
             return new StringBuilder(a).append(b).toString();
         };

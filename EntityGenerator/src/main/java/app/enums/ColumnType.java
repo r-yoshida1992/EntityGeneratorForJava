@@ -1,21 +1,34 @@
 package app.enums;
 
 public enum ColumnType {
-    DECIMAL(0, "Long"),
-    BIGINT(1, "Long"),
-    DATETIME(2, "String"),
-    VARCHAR(3, "String");
+    TINYINT("Byte"),
+    SMALLINT( "Short"),
+    MEDIUMINT("Integer"),
+    INT("Integer"),
+    BIGINT("Long"),
+    FLOAT("Float"),
+    DOUBLE("Double"),
+    DECIMAL("Double"),
+    CHAR("String"),
+    VARCHAR("String"),
+    TINYBLOB("String"),
+    BLOB("String"),
+    MEDIUMBLOB("String"),
+    LONGBLOB("String"),
+    TINYTEXT("String"),
+    TEXT("String"),
+    MEDIUMTEXT("String"),
+    LONGTEXT("String"),
+    DATE("String"),
+    TIME("String"),
+    DATETIME("String"),
+    TIMESTAMP("String"),
+    YEAR("String");
 
-    private Integer id;
     private String objectType;
 
-    ColumnType(Integer id, String objectType) {
-        this.id = id;
+    ColumnType(String objectType) {
         this.objectType = objectType;
-    }
-
-    public Integer getId() {
-        return id;
     }
 
     public String getObjectType() {
