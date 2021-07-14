@@ -1,4 +1,4 @@
-package config;
+package app.config;
 
 /**
  * アプリケーションのウィンドウ位置を保持

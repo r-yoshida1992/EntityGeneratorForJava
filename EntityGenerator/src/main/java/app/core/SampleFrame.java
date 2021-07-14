@@ -16,8 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import app.config.Position;
 import app.connector.DataBaseConnector;
-import config.Position;
+import app.enums.ColumnType;
+import app.utils.StringUtil;
 
 public class SampleFrame extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -49,19 +51,37 @@ public class SampleFrame extends JFrame {
 
         JButton addButton = new JButton("Generate");
         addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
-                    ResultSet rs = DataBaseConnector
-                            .executeSql("select * from " + comboBox.getItemAt(comboBox.getSelectedIndex()));
+                    ResultSet rs = DataBaseConnector.executeSql(
+                            "select * from " + comboBox.getItemAt(comboBox.getSelectedIndex()) + " limit 1");
                     ResultSetMetaData rsmd = rs.getMetaData();
+                    // 出力処理
+                    String header = new StringBuilder().append("import javax.persistence.Column;\n")
+                            .append("import javax.persistence.Entity;\n")
+                            .append("import javax.persistence.GeneratedValue;\n")
+                            .append("import javax.persistence.GenerationType;\n")
+                            .append("import javax.persistence.Id;\n").append("import javax.persistence.Table;\n")
+                            .append("\n").append("import lombok.Data;\n").append("import lombok.EqualsAndHashCode;\n")
+                            .append("/**\n").append(" * ").append(rsmd.getTableName(1)).append(" entity.\n")
+                            .append(" */\n").append("@Data\n").append("@Entity\n").append("@Table(name = \"")
+                            .append(rsmd.getTableName(1)).append("\")\n")
+                            .append("@EqualsAndHashCode(callSuper = false)\n").append("public class ")
+                            .append(StringUtil.snakeToCamel(rsmd.getTableName(1), false)).append("{\n").append("\n")
+                            .toString();
+                    System.out.print(header);
                     rsmd.getColumnCount();
                     for (int i = 0; i < rsmd.getColumnCount(); i++) {
                         // カラム名の出力
-                        System.out.println(rsmd.getColumnTypeName(i + 1));
-                        System.out.println(rsmd.getColumnName(i + 1));
+                        System.out.println("    @Column(name = \"" + rsmd.getColumnName(i + 1) + "\")");
+                        System.out.println(
+                                "    private " + ColumnType.valueOf(rsmd.getColumnTypeName(i + 1)).getObjectType() + " "
+                                        + StringUtil.snakeToCamel(rsmd.getColumnName(i + 1), true) + ";");
                     }
-                } catch (SQLException _e) {
-                    _e.printStackTrace();
+                    String footer = new StringBuilder().append("\n").append("}\n").toString();
+                    System.out.print(footer);
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
         });
